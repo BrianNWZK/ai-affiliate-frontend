@@ -1,8 +1,8 @@
-export default function Home() {
+export default function Dashboard() {
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Welcome to AI Affiliate SaaS</h1>
-      <p>This is your homepage.</p>
-    </div>
+    <main>
+      <h1>Dashboard</h1>
+      <p>This is your AI Affiliate dashboard!</p>
+    </main>
   );
 }
