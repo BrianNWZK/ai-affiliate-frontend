@@ -5,7 +5,7 @@ import {
   Calendar, BarChart3, Bot, Zap, Clock, CreditCard, FilePlus, ShoppingCart, Star, 
   Users, AlertCircle, ExternalLink, Rocket, TrendingDown, Eye , MousePointer, Gift,
   Brain, Globe, Network, Cpu, Activity, Command, Shield, Crown, Layers, Workflow,
-  Sparkles, Radar, Atom, Infinity, Hexagon, Satellite, Gamepad 2, Gauge
+  Sparkles, Radar, Atom, Infinity, Hexagon, Satellite, Gamepad2, Gauge
 } from "lucide-react";
 
 const AffiliateMarketingAI = () => {
@@ -63,7 +63,15 @@ const AffiliateMarketingAI = () => {
     "Creating affiliate product review...",
     "Sending email campaigns...",
     "Posting to socials...",
-    "Generating video scripts..."
+    "Generating video scripts...",
+    "/neural/economic-predictions",
+    "/neural/deploy-agents",
+    "/neural/deploy-single-agent",
+    "/neural/activate-economic-system",
+    "/neural/quantum-matching",
+    "/neural/butterfly-effect",
+    "/neural/emergency-stop",
+    "/analytics/neural-track"
   ];
 
   useEffect(() => {
