@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Brain, Rocket, Gauge, Bot, DollarSign, TrendingUp, Network, Radar, Atom,
-} from "lucide-react";
+import { Brain, Rocket, Gauge, Bot, DollarSign, TrendingUp, Network, Radar, Atom } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// ======================= Helper Functions =======================
 const formatCurrency = (value, currency = "NGN") => {
   const symbols = { NGN: "₦", USD: "$", GBP: "£", EUR: "€" };
   return `${symbols[currency] || ""}${value.toLocaleString()}`;
 };
 
-// ======================= Components =======================
 const StatCard = ({ label, value, icon: Icon, color }) => (
   <div className={`bg-gradient-to-br ${color} p-4 rounded-xl shadow-lg border border-white/20`}>
     <div className="flex items-center justify-between mb-2">
@@ -47,10 +43,7 @@ const NeuralCommerceEcosystem = () => {
         }));
         setEcosystemLog((prev) => [
           ...prev,
-          {
-            time: new Date().toLocaleTimeString(),
-            msg: `Revenue updated: ${formatCurrency(data.total, currency)}`,
-          },
+          { time: new Date().toLocaleTimeString(), msg: `Revenue updated: ${formatCurrency(data.total, currency)}` },
         ]);
       }
     } catch (error) {
@@ -65,7 +58,6 @@ const NeuralCommerceEcosystem = () => {
   const activateEcosystem = useCallback(async () => {
     setActivationLoading(true);
     try {
-      // Simulate activation
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setIsActive(true);
       setEcosystemLog((prev) => [
@@ -112,10 +104,7 @@ const NeuralCommerceEcosystem = () => {
 
       setEcosystemLog((prev) => [
         ...prev.slice(-12),
-        {
-          time: new Date().toLocaleTimeString(),
-          msg: activities[Math.floor(Math.random() * activities.length)],
-        },
+        { time: new Date().toLocaleTimeString(), msg: activities[Math.floor(Math.random() * activities.length)] },
       ]);
       fetchRevenue();
     }, 4000);
