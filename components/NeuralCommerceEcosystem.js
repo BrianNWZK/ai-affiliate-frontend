@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
 import { Brain, Rocket, Gauge, Bot, DollarSign, TrendingUp, Network, Radar, Atom } from "lucide-react";
 
