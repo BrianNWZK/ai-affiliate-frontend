@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Play, Pause, Mail, FileText, Share2, DollarSign, Target, TrendingUp, Clock, CreditCard,
