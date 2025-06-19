@@ -4,3 +4,4 @@ export default function RootLayout({ children }) {
       <body>{children}</body>
     </html>
   );
+}
