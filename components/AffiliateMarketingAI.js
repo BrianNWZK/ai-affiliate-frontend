@@ -1,19 +1,18 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   Play, Pause, Mail, FileText, Share2, DollarSign, 
-  Target, TrendingUp, Clock, CreditCard, Loader2, AlertCircle, CheckCircle
+  Target, TrendingUp, Clock, CreditCard, Loader2, 
+  AlertCircle, CheckCircle, RefreshCw
 } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://ai-affiliate-backend.onrender.com";
 
 const AffiliateMarketingAI = () => {
   // ===== 1. Enhanced State Management =====
-  const [automationState, setAutomationState] = useState({
-    isRunning: false,
-    isPaused: false,
-    isLoading: false,
-    currentTask: "System ready",
+  const [automation, setAutomation] = useState({
+    status: 'idle', // 'idle' | 'starting' | 'running' | 'stopping' | 'error'
+    currentTask: 'System ready',
     error: null
   });
 
@@ -24,24 +23,57 @@ const AffiliateMarketingAI = () => {
     posts: 0,
     leads: 0,
     conversions: 0,
-    _lastUpdated: null
+    lastUpdated: null
   });
 
   const [activityLog, setActivityLog] = useState([]);
   const [currency, setCurrency] = useState("NGN");
+  const automationTasks = useRef([
+    "Analyzing market trends...",
+    "Generating affiliate content...",
+    "Optimizing campaign performance...",
+    "Scheduled email dispatch...",
+    "Updating social channels..."
+  ]);
 
-  // ===== 2. Improved Automation Control =====
-  const toggleAutomation = useCallback(async () => {
-    setAutomationState(prev => ({ ...prev, isLoading: true, error: null }));
-    
+  // ===== 2. Robust API Client =====
+  const apiClient = useCallback(async (endpoint, options = {}) => {
     try {
-      const action = automationState.isRunning ? "stop" : "start";
-      const res = await fetch(`${API_URL}/affiliate/automation`, {
-        method: "POST",
-        headers: { 
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer YOUR_TOKEN" // Add if needed
-        },
+          "Accept": "application/json",
+          ...options.headers
+        }
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText.startsWith('<!DOCTYPE') 
+          ? "Server returned HTML error page" 
+          : errorText);
+      }
+
+      return await res.json();
+    } catch (err) {
+      console.error(`API Error (${endpoint}):`, err);
+      throw err;
+    }
+  }, []);
+
+  // ===== 3. Automation Control =====
+  const toggleAutomation = useCallback(async () => {
+    try {
+      setAutomation(prev => ({
+        ...prev,
+        status: prev.status === 'running' ? 'stopping' : 'starting',
+        error: null
+      }));
+
+      const action = automation.status === 'running' ? 'stop' : 'start';
+      await apiClient('/affiliate/automation', {
+        method: 'POST',
         body: JSON.stringify({ 
           action,
           currency,
@@ -49,141 +81,152 @@ const AffiliateMarketingAI = () => {
         })
       });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to toggle automation");
-      }
-
-      setAutomationState(prev => ({
-        ...prev,
-        isRunning: !prev.isRunning,
-        isLoading: false,
-        currentTask: !prev.isRunning ? "Initializing campaigns..." : "Stopping systems..."
+      setAutomation(prev => ({
+        status: action === 'start' ? 'running' : 'idle',
+        currentTask: action === 'start' 
+          ? "Initializing campaigns..." 
+          : "System ready",
+        error: null
       }));
 
-      logActivity(!automationState.isRunning ? "🚀 Automation started" : "🛑 Automation stopped");
+      logActivity(action === 'start' 
+        ? "🚀 Automation started" 
+        : "🛑 Automation stopped");
 
     } catch (err) {
-      setAutomationState(prev => ({
+      setAutomation(prev => ({
         ...prev,
-        isLoading: false,
+        status: 'error',
         error: err.message,
-        currentTask: `Error: ${err.message}`
+        currentTask: `Error: ${err.message.split('\n')[0]}`
       }));
-      logActivity(`❌ ${err.message}`);
+      logActivity(`❌ ${err.message.split('\n')[0]}`);
     }
-  }, [automationState.isRunning, currency]);
+  }, [apiClient, currency, automation.status]);
 
-  // ===== 3. Task Simulation Engine =====
+  // ===== 4. Task Engine =====
   useEffect(() => {
     let interval;
-    if (automationState.isRunning && !automationState.isPaused) {
-      interval = setInterval(() => {
-        // Rotate through realistic tasks
-        setAutomationState(prev => {
-          const tasks = [
-            "Analyzing market trends...",
-            "Generating affiliate content...",
-            "Optimizing campaign performance...",
-            "Scheduled email dispatch...",
-            "Updating social channels..."
-          ];
-          const nextIndex = (tasks.indexOf(prev.currentTask) + 1) % tasks.length;
-          return { ...prev, currentTask: tasks[nextIndex] };
-        });
+    if (automation.status === 'running') {
+      let taskIndex = 0;
+      
+      const updateTask = () => {
+        taskIndex = (taskIndex + 1) % automationTasks.current.length;
+        setAutomation(prev => ({
+          ...prev,
+          currentTask: automationTasks.current[taskIndex]
+        }));
+      };
 
-        // Simulate metrics
+      interval = setInterval(() => {
+        updateTask();
+        
+        // Simulate organic metric growth
         setStats(prev => ({
           ...prev,
           content: prev.content + 1,
-          emails: prev.emails + Math.floor(Math.random() * 10),
-          posts: prev.posts + (Math.random() > 0.7 ? 1 : 0),
-          leads: prev.leads + Math.floor(Math.random() * 3),
-          conversions: prev.conversions + (Math.random() > 0.9 ? 1 : 0)
+          emails: prev.emails + Math.floor(Math.random() * 5),
+          posts: prev.posts + (Math.random() > 0.8 ? 1 : 0),
+          leads: prev.leads + Math.floor(Math.random() * 2),
+          conversions: prev.conversions + (Math.random() > 0.95 ? 1 : 0),
+          lastUpdated: new Date().toISOString()
         }));
+      }, 5000); // More natural 5s interval
 
-      }, 3000); // More realistic 3s interval
+      // Initial update
+      updateTask();
     }
-    return () => clearInterval(interval);
-  }, [automationState.isRunning, automationState.isPaused]);
 
-  // ===== 4. Revenue Tracking =====
+    return () => clearInterval(interval);
+  }, [automation.status]);
+
+  // ===== 5. Data Fetching =====
   const fetchRevenue = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/paystack/revenue?currency=${currency}`);
-      const data = await res.json();
-      
+      const data = await apiClient(`/paystack/revenue?currency=${currency}`);
       setStats(prev => ({
         ...prev,
         revenue: data?.total || 0,
-        _lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString()
       }));
-      
     } catch (err) {
-      console.error("Revenue fetch failed:", err);
       logActivity("⚠️ Using cached revenue data");
     }
-  }, [currency]);
+  }, [apiClient, currency]);
 
-  // ===== 5. Payment Processing =====
+  // ===== 6. Payment Processing =====
   const handlePayment = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/paystack/checkout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      setAutomation(prev => ({ ...prev, status: 'starting' }));
+      
+      const data = await apiClient('/paystack/checkout', {
+        method: 'POST',
         body: JSON.stringify({
           email: "user@example.com",
           amount: 100000, // ₦1000 in kobo
           currency,
           metadata: {
-            source: "affiliate_dashboard"
+            source: "affiliate_dashboard",
+            timestamp: new Date().toISOString()
           }
         })
       });
 
-      const data = await res.json();
       if (data.authorization_url) {
-        window.open(data.authorization_url, "_blank");
+        window.open(data.authorization_url, "_blank", "noopener,noreferrer");
         logActivity("🔗 Payment initiated");
       }
     } catch (err) {
-      logActivity(`❌ Payment failed: ${err.message}`);
+      logActivity(`❌ Payment failed: ${err.message.split('\n')[0]}`);
+    } finally {
+      setAutomation(prev => prev.status === 'starting' 
+        ? { ...prev, status: 'idle' } 
+        : prev);
     }
-  }, [currency]);
+  }, [apiClient, currency]);
 
-  // ===== 6. Helper Functions =====
-  const logActivity = (message) => {
+  // ===== 7. Helper Functions =====
+  const logActivity = useCallback((message) => {
     setActivityLog(prev => [
-      ...prev.slice(-9),
+      ...prev.slice(-14), // Keep last 15 entries
       {
         id: Date.now(),
         time: new Date().toLocaleTimeString(),
         message,
-        icon: message.startsWith("❌") ? AlertCircle : CheckCircle
+        icon: message.startsWith("❌") ? AlertCircle : 
+              message.startsWith("⚠️") ? AlertCircle : 
+              CheckCircle
       }
     ]);
-  };
+  }, []);
 
-  const formatCurrency = (value) => {
+  const formatCurrency = useCallback((value) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
       currency: currency
     }).format(value || 0);
-  };
+  }, [currency]);
 
-  // ===== 7. Component Render =====
+  // ===== 8. Initial Data Load =====
+  useEffect(() => {
+    fetchRevenue();
+  }, [fetchRevenue]);
+
+  // ===== 9. Component Render =====
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-6 text-white">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <header className="space-y-2">
           <h1 className="text-3xl font-bold flex items-center gap-3">
             <FileText className="text-cyan-400" />
             Affiliate Marketing Dashboard
           </h1>
+          <p className="text-white/80">Automated campaign management system</p>
         </header>
 
         {/* Control Panel */}
-        <div className="bg-white/10 p-6 rounded-xl mb-8 border border-white/20">
+        <section className="bg-white/10 p-6 rounded-xl border border-white/20 space-y-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Clock className="text-yellow-400" /> Control Panel
@@ -193,7 +236,7 @@ const AffiliateMarketingAI = () => {
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="bg-white/10 text-white border border-white/20 px-4 py-2 rounded-lg"
+                className="bg-white/10 text-white border border-white/20 px-4 py-2 rounded-lg hover:bg-white/20 transition"
               >
                 {["NGN", "USD", "GBP", "EUR"].map(curr => (
                   <option key={curr} value={curr}>
@@ -204,23 +247,24 @@ const AffiliateMarketingAI = () => {
 
               <button
                 onClick={handlePayment}
-                className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-lg"
+                disabled={automation.status === 'starting'}
+                className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded-lg transition disabled:opacity-50"
               >
                 <CreditCard size={18} /> Buy Now
               </button>
 
               <button
                 onClick={toggleAutomation}
-                disabled={automationState.isLoading}
-                className={`flex items-center gap-2 px-5 py-2 rounded-lg ${
-                  automationState.isRunning 
+                disabled={automation.status === 'starting' || automation.status === 'stopping'}
+                className={`flex items-center gap-2 px-5 py-2 rounded-lg transition ${
+                  automation.status === 'running' 
                     ? "bg-red-600 hover:bg-red-700" 
                     : "bg-green-600 hover:bg-green-700"
-                } ${automationState.isLoading ? "opacity-50" : ""}`}
+                } disabled:opacity-50`}
               >
-                {automationState.isLoading ? (
+                {automation.status === 'starting' || automation.status === 'stopping' ? (
                   <Loader2 className="animate-spin" size={20} />
-                ) : automationState.isRunning ? (
+                ) : automation.status === 'running' ? (
                   <>
                     <Pause size={20} /> Stop
                   </>
@@ -233,21 +277,28 @@ const AffiliateMarketingAI = () => {
             </div>
           </div>
 
-          {automationState.currentTask && (
-            <p className="mt-4 text-blue-300 flex items-center gap-2">
-              <Clock size={16} />
-              {automationState.currentTask}
-              {automationState.error && (
-                <span className="text-red-400 ml-2">
-                  ({automationState.error})
-                </span>
-              )}
+          {/* Status Bar */}
+          <div className="flex items-center gap-3">
+            <div className={`w-3 h-3 rounded-full ${
+              automation.status === 'running' ? 'bg-green-500 animate-pulse' :
+              automation.status === 'error' ? 'bg-red-500' : 'bg-gray-500'
+            }`} />
+            <p className="text-blue-300 flex-1 truncate">
+              {automation.currentTask}
             </p>
-          )}
-        </div>
+            {automation.status === 'error' && (
+              <button 
+                onClick={() => setAutomation(prev => ({ ...prev, error: null }))}
+                className="text-red-400 hover:text-red-300"
+              >
+                <RefreshCw size={16} />
+              </button>
+            )}
+          </div>
+        </section>
 
         {/* Stats Dashboard */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
             { label: "Revenue", value: stats.revenue, icon: DollarSign },
             { label: "Content", value: stats.content, icon: FileText },
@@ -256,35 +307,48 @@ const AffiliateMarketingAI = () => {
             { label: "Leads", value: stats.leads, icon: Target },
             { label: "Conversions", value: stats.conversions, icon: TrendingUp }
           ].map((stat) => (
-            <div key={stat.label} className="bg-white/10 p-4 rounded-xl">
+            <div key={stat.label} className="bg-white/10 p-4 rounded-xl hover:bg-white/20 transition">
               <div className="flex items-center gap-2 text-gray-300 mb-1">
                 <stat.icon size={16} />
                 <span className="text-sm">{stat.label}</span>
               </div>
               <p className="text-xl font-bold">
-                {typeof stat.value === "number" ? stat.value : "--"}
+                {stat.value !== null ? 
+                  (stat.label === "Revenue" ? formatCurrency(stat.value) : stat.value) 
+                  : "--"}
               </p>
             </div>
           ))}
-        </div>
+        </section>
 
         {/* Activity Log */}
-        <div className="bg-white/10 p-6 rounded-xl border border-white/20">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <TrendingUp className="text-cyan-400" /> Activity Log
-          </h3>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+        <section className="bg-white/10 p-6 rounded-xl border border-white/20">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <TrendingUp className="text-cyan-400" /> Activity Log
+            </h3>
+            <button 
+              onClick={() => setActivityLog([])}
+              className="text-sm text-gray-400 hover:text-white"
+            >
+              Clear
+            </button>
+          </div>
+          
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
             {activityLog.length > 0 ? (
               activityLog.map(log => (
-                <div key={log.id} className="text-sm">
-                  <span className="text-cyan-400">{log.time}</span> - {log.message}
+                <div key={log.id} className="text-sm flex items-start gap-2">
+                  <span className="text-cyan-400 font-mono">{log.time}</span>
+                  <span className="flex-1">{log.message}</span>
+                  <log.icon size={16} className="flex-shrink-0 mt-0.5" />
                 </div>
               ))
             ) : (
-              <p className="text-gray-400">No activities recorded</p>
+              <p className="text-gray-400 italic">No activities recorded</p>
             )}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
