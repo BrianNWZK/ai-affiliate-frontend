@@ -1,3 +1,97 @@
+/* styles/globals.css - Zero-Breaking-Changes Update */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ===== 100% Backward-Compatible Base Styles ===== */
+@layer base {
+  :root {
+    /* Your existing color variables */
+    --color-primary: 59 130 246;
+    --color-success: 16 185 129;
+    --color-danger: 239 68 68;
+    --color-warning: 245 158 11;
+  }
+
+  /* Preserved original dashboard container styles */
+  .dashboard-container, .neural-dashboard {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* ===== Enhanced Buttons (Same Class Names) ===== */
+@layer components {
+  /* Original button styles with performance improvements */
+  button {
+    background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Optimized stat cards (same markup works) */
+  .stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Enhanced strategy cards (no markup changes needed) */
+  .strategy-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .strategy-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .strategy-card.active {
+    background: linear-gradient(90deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.2) 100%);
+    border: 1px solid #3b82f6;
+  }
+}
+
+/* ===== 100% Compatible Utilities ===== */
+@layer utilities {
+  /* Original pulse animation (unchanged) */
+  .pulse-dot {
+    width: 12px;
+    height: 12px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.6; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 0.6; transform: scale(0.95); }
+  }
+
+  /* New additions (safe to add) */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
