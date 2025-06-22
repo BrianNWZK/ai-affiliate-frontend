@@ -1,96 +1,127 @@
-/* styles/globals.css - Zero-Breaking-Changes Update */
+/* styles/globals.css - Quantum AI Enhanced */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== 100% Backward-Compatible Base Styles ===== */
+/* ===== Quantum Color System ===== */
 @layer base {
   :root {
-    /* Your existing color variables */
+    /* Original colors (unchanged) */
     --color-primary: 59 130 246;
     --color-success: 16 185 129;
     --color-danger: 239 68 68;
     --color-warning: 245 158 11;
+
+    /* Quantum additions */
+    --quantum-core: 0 240 255;
+    --neural-network: 255 0 170;
+    --quantum-glow: 0 240 255;
   }
 
-  /* Preserved original dashboard container styles */
-  .dashboard-container, .neural-dashboard {
+  /* Preserved original dashboard styles */
+  .dashboard-container {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     color: white;
     padding: 2rem;
     border-radius: 1rem;
     font-family: 'Inter', sans-serif;
   }
+
+  /* New quantum dashboard variant */
+  .quantum-dashboard {
+    background: linear-gradient(135deg, #0e0e2e 0%, #1a1a4a 100%);
+    border: 1px solid rgba(var(--quantum-core), 0.1);
+    box-shadow: 0 0 30px rgba(var(--quantum-core), 0.05);
+  }
 }
 
-/* ===== Enhanced Buttons (Same Class Names) ===== */
+/* ===== Enhanced Components ===== */
 @layer components {
-  /* Original button styles with performance improvements */
+  /* Original button with quantum states */
   button {
-    background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(90deg, 
+      rgb(var(--color-primary)) 0%, 
+      rgb(var(--color-primary) / 90%) 100%);
+    transition: all 0.2s ease-out;
   }
 
-  /* Optimized stat cards (same markup works) */
+  button.quantum {
+    background: linear-gradient(90deg, 
+      rgba(var(--quantum-core), 0.7) 0%, 
+      rgba(var(--quantum-core), 0.5) 100%);
+    box-shadow: 0 0 15px rgba(var(--quantum-core), 0.3);
+  }
+
+  button.neural {
+    background: linear-gradient(90deg, 
+      rgba(var(--neural-network), 0.7) 0%, 
+      rgba(var(--neural-network), 0.5) 100%);
+  }
+
+  /* Enhanced stat cards with quantum glow */
   .stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply bg-white/5 p-6 rounded-xl border border-white/10;
+    transition: all 0.3s ease;
   }
 
-  /* Enhanced strategy cards (no markup changes needed) */
-  .strategy-card {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
+  .stat-card.quantum-verified {
+    border-color: rgba(var(--quantum-core), 0.3);
+    box-shadow: 0 0 20px rgba(var(--quantum-core), 0.05);
   }
 
-  .strategy-card:hover {
-    background: rgba(255, 255, 255, 0.1);
+  /* Quantum console styling */
+  .quantum-console {
+    @apply bg-black/50 p-4 rounded-lg font-mono text-sm;
+    border: 1px solid rgba(var(--quantum-core), 0.2);
   }
 
-  .strategy-card.active {
-    background: linear-gradient(90deg, rgba(37, 99, 235, 0.2) 0%, rgba(29, 78, 216, 0.2) 100%);
-    border: 1px solid #3b82f6;
+  .console-line {
+    @apply py-1 border-b border-white/5 last:border-0;
   }
 }
 
-/* ===== 100% Compatible Utilities ===== */
+/* ===== Quantum Animations ===== */
 @layer utilities {
-  /* Original pulse animation (unchanged) */
+  /* Original pulse animation */
   .pulse-dot {
-    width: 12px;
-    height: 12px;
-    background: #10b981;
-    border-radius: 50%;
     animation: pulse 1.5s infinite;
   }
 
-  @keyframes pulse {
-    0% { opacity: 0.6; transform: scale(0.95); }
-    50% { opacity: 1; transform: scale(1.05); }
-    100% { opacity: 0.6; transform: scale(0.95); }
+  /* New quantum animations */
+  .quantum-pulse {
+    animation: quantum-pulse 2s infinite;
   }
 
-  /* New additions (safe to add) */
+  .neural-flicker {
+    animation: neural-flicker 3s infinite;
+  }
+
+  @keyframes quantum-pulse {
+    0%, 100% { 
+      opacity: 0.6; 
+      box-shadow: 0 0 5px rgba(var(--quantum-core), 0.3);
+    }
+    50% { 
+      opacity: 1; 
+      box-shadow: 0 0 20px rgba(var(--quantum-core), 0.6);
+    }
+  }
+
+  @keyframes neural-flicker {
+    0%, 19%, 21%, 59%, 61%, 100% {
+      opacity: 1;
+    }
+    20%, 60% {
+      opacity: 0.3;
+    }
+  }
+
+  /* Quantum glow effect */
+  .quantum-glow {
+    text-shadow: 0 0 10px rgba(var(--quantum-glow), 0.7);
+  }
+
+  /* Safe utility additions */
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
