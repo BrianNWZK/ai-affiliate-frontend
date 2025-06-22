@@ -1,147 +1,188 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { QuantumLoader, HolographicError } from '@/components/quantum'
+import { useQuantumEntanglement } from '@/hooks/useQuantum'
+import { fetchRevenue, fetchEcosystemStatus, activateEcosystem } from '@/lib/quantum-api'
 import AffiliateMarketingAI from '../components/AffiliateMarketingAI'
 import NeuralCommerceEcosystem from '../components/NeuralCommerceEcosystem'
 
 export default function Home() {
-  const [dashboardData, setDashboardData] = useState({
-    revenue: '--',
-    content: 0,
-    emails: 0,
-    posts: 0,
-    leads: 0,
-    conversions: 0,
-    ecosystemStatus: 'INACTIVE',
+  // Quantum state management
+  const { entangle, observe, quantumState } = useQuantumEntanglement()
+  const [activityLog, setActivityLog] = useState([
+    '🌌 Initializing quantum interface...',
+    '⚡ Powering neural networks...'
+  ])
+
+  // Dashboard state with quantum entanglement
+  const [dashboard, setDashboard] = useState({
+    revenue: { amount: '--', currency: 'NGN', verified: false },
+    metrics: { content: 0, emails: 0, posts: 0, leads: 0, conversions: 0 },
+    ecosystem: { status: 'INACTIVE', quantumLinked: false },
     loading: true,
     error: null
   })
 
-  const [activityLog, setActivityLog] = useState([
-    'System initialized'
-  ])
-
-  // Fetch initial dashboard data
+  // Quantum-enhanced data fetching
   useEffect(() => {
-    const fetchDashboardData = async () => {
+    const quantumFetch = async () => {
       try {
-        setDashboardData(prev => ({ ...prev, loading: true }))
-        addActivityLog('Fetching dashboard data...')
+        observe('DATA_FETCH_START')
+        addActivityLog('🌀 Establishing quantum connection...')
         
-        // Fetch revenue data
-        const revenueRes = await fetch('https://ai-affiliate-backend.onrender.com/paystack/revenue?currency=NGN')
-        if (!revenueRes.ok) throw new Error('Failed to fetch revenue data')
-        const revenueData = await revenueRes.json()
-        
-        // Fetch ecosystem status
-        const ecosystemRes = await fetch('https://ai-affiliate-backend.onrender.com/ecosystem/status')
-        const ecosystemData = await ecosystemRes.json()
+        // Parallel quantum requests
+        const [revenue, ecosystem] = await Promise.allSettled([
+          fetchRevenue('NGN'),
+          fetchEcosystemStatus()
+        ])
 
-        setDashboardData({
-          revenue: revenueData.amount || '--',
-          content: revenueData.content || 0,
-          emails: revenueData.emails || 0,
-          posts: revenueData.posts || 0,
-          leads: revenueData.leads || 0,
-          conversions: revenueData.conversions || 0,
-          ecosystemStatus: ecosystemData.status || 'INACTIVE',
+        // Quantum entanglement of responses
+        const entangledData = entangle({
+          revenue: revenue.status === 'fulfilled' ? revenue.value : null,
+          ecosystem: ecosystem.status === 'fulfilled' ? ecosystem.value : null
+        })
+
+        setDashboard({
+          revenue: {
+            amount: entangledData.revenue?.amount || '--',
+            currency: 'NGN',
+            verified: entangledData.revenue?.quantumVerified || false
+          },
+          metrics: {
+            content: entangledData.revenue?.content || 0,
+            emails: entangledData.revenue?.emails || 0,
+            posts: entangledData.revenue?.posts || 0,
+            leads: entangledData.revenue?.leads || 0,
+            conversions: entangledData.revenue?.conversions || 0
+          },
+          ecosystem: {
+            status: entangledData.ecosystem?.status || 'INACTIVE',
+            quantumLinked: entangledData.ecosystem?.quantumLinked || false
+          },
           loading: false,
           error: null
         })
-        
-        addActivityLog('Dashboard data loaded successfully', '✅')
-      } catch (err) {
-        setDashboardData(prev => ({ ...prev, error: err.message, loading: false }))
-        addActivityLog(`Error: ${err.message}`, '❌')
+
+        addActivityLog('✅ Quantum sync complete', '🔄')
+        observe('DATA_FETCH_SUCCESS')
+      } catch (error) {
+        setDashboard(prev => ({
+          ...prev,
+          loading: false,
+          error: error.message
+        }))
+        addActivityLog(`❌ Quantum collapse: ${error.message}`)
+        observe('DATA_FETCH_ERROR', error)
       }
     }
 
-    fetchDashboardData()
-  }, [])
+    quantumFetch()
+  }, [entangle, observe])
 
-  const addActivityLog = (message, emoji = 'ℹ️') => {
-    const timestamp = new Date().toLocaleTimeString()
+  // Neural activity logger with quantum entanglement
+  const addActivityLog = (message, icon = 'ℹ️') => {
+    const timestamp = new Date().toLocaleTimeString([], { hour12: false })
     setActivityLog(prev => [
-      ...prev.slice(-9), // Keep only last 10 entries
-      `${emoji} ${timestamp} ${message}`
+      ...prev.slice(-14), // Keep last 15 entries (quantum limit)
+      `${icon} [${timestamp}] ${message}`
     ])
   }
 
+  // Quantum ecosystem activation
   const handleActivateEcosystem = async () => {
     try {
-      addActivityLog('Attempting ecosystem activation...')
-      const res = await fetch('https://ai-affiliate-backend.onrender.com/ecosystem/activate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ user_id: 'dashboard_user' })
+      addActivityLog('⚡ Initiating quantum activation sequence...')
+      const result = await activateEcosystem({ 
+        userId: 'quantum_user',
+        activationVector: [0.7, 0.2, 0.1] // Neural activation pattern
       })
-      
-      const data = await res.json()
-      if (data.success) {
-        setDashboardData(prev => ({
+
+      if (result.success) {
+        setDashboard(prev => ({
           ...prev,
-          ecosystemStatus: 'ACTIVE'
+          ecosystem: {
+            status: 'ACTIVE',
+            quantumLinked: result.quantumLinked
+          }
         }))
-        addActivityLog('Ecosystem activated successfully!', '✅')
+        addActivityLog('🌐 Neural ecosystem ONLINE', '✅')
       } else {
-        throw new Error(data.message || 'Activation failed')
+        throw new Error(result.error || 'Quantum activation failed')
       }
-    } catch (err) {
-      addActivityLog(`Activation failed: ${err.message}`, '❌')
+    } catch (error) {
+      addActivityLog(`⚠️ Activation error: ${error.message}`)
     }
   }
 
-  if (dashboardData.loading) {
+  // Memoized dashboard state for quantum performance
+  const quantumDashboard = useMemo(() => ({
+    ...dashboard,
+    activityLog,
+    refresh: () => window.location.reload(),
+    activate: handleActivateEcosystem
+  }), [dashboard, activityLog])
+
+  // Render states
+  if (dashboard.loading) {
     return (
-      <main className="min-h-screen bg-gray-900 text-white px-4 py-8 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p>Loading dashboard data...</p>
-        </div>
+      <main className="quantum-interface">
+        <QuantumLoader 
+          message={quantumState === 'entangled' 
+            ? "Syncing quantum states..." 
+            : "Calibrating neural networks..."}
+        />
       </main>
     )
   }
 
-  if (dashboardData.error) {
+  if (dashboard.error) {
     return (
-      <main className="min-h-screen bg-gray-900 text-white px-4 py-8 flex items-center justify-center">
-        <div className="text-center bg-red-900/50 p-6 rounded-lg max-w-md">
-          <h2 className="text-2xl font-bold mb-2">Error Loading Dashboard</h2>
-          <p className="mb-4">{dashboardData.error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded"
-          >
-            Retry
-          </button>
-        </div>
+      <main className="quantum-interface">
+        <HolographicError 
+          title="Quantum Decoherence Detected"
+          message={dashboard.error}
+          action={{
+            label: "Reinitialize",
+            handler: () => window.location.reload()
+          }}
+        />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-gray-900 text-white px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-12">
-        Welcome to AI Affiliate Marketing System Dashboard
-      </h1>
-      
-      <div className="max-w-7xl mx-auto flex flex-col gap-16">
+    <main className="quantum-interface">
+      <header className="quantum-header">
+        <h1 className="neural-title">
+          <span className="title-gradient">Quantum Affiliate Nexus</span>
+          <span className={`quantum-badge ${dashboard.ecosystem.quantumLinked ? 'active' : ''}`}>
+            {dashboard.ecosystem.quantumLinked ? '⚛️ Quantum Linked' : '🧠 Neural Mode'}
+          </span>
+        </h1>
+      </header>
+
+      <div className="quantum-grid">
         <AffiliateMarketingAI 
-          revenue={dashboardData.revenue}
-          content={dashboardData.content}
-          emails={dashboardData.emails}
-          posts={dashboardData.posts}
-          leads={dashboardData.leads}
-          conversions={dashboardData.conversions}
+          revenue={dashboard.revenue}
+          metrics={dashboard.metrics}
           activityLog={activityLog}
+          quantumVerified={dashboard.revenue.verified}
           onRefresh={() => window.location.reload()}
         />
         
         <NeuralCommerceEcosystem 
-          status={dashboardData.ecosystemStatus}
+          status={dashboard.ecosystem.status}
+          quantumLinked={dashboard.ecosystem.quantumLinked}
           onActivate={handleActivateEcosystem}
         />
+      </div>
+
+      <div className="quantum-console">
+        {activityLog.map((log, index) => (
+          <div key={index} className="console-line">
+            {log}
+          </div>
+        ))}
       </div>
     </main>
   )
