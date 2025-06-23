@@ -6,7 +6,7 @@ const nextConfig = {
   swcMinify: true,
   productionBrowserSourceMaps: false,
 
-  // Quantum Security Headers with AI Protection
+  // Quantum Security Headers with Paystack Integration
   async headers() {
     const quantumSecurityHeaders = [
       {
@@ -24,14 +24,14 @@ const nextConfig = {
       {
         key: 'Content-Security-Policy',
         value: `
-          default-src 'self' ${process.env.NEXT_PUBLIC_API_URL} ${process.env.NEXT_PUBLIC_QUANTUM_GATEWAY};
-          script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'quantum-ai';
+          default-src 'self' ${process.env.NEXT_PUBLIC_API_URL} ${process.env.NEXT_PUBLIC_QUANTUM_GATEWAY} https://api.paystack.co;
+          script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' 'quantum-ai' https://js.paystack.co;
           style-src 'self' 'unsafe-inline' 'quantum-styles';
-          img-src 'self' data: blob: https://*.quantum-cdn.com;
-          connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL} *.vercel.app wss://*.quantum-network.com;
-          frame-src 'none';
+          img-src 'self' data: blob: https://*.quantum-cdn.com https://*.paystack.com;
+          connect-src 'self' ${process.env.NEXT_PUBLIC_API_URL} *.vercel.app wss://*.quantum-network.com https://api.paystack.co;
+          frame-src 'none' https://js.paystack.co;
           base-uri 'self';
-          form-action 'self';
+          form-action 'self' https://api.paystack.co;
           require-trusted-types-for 'script';
         `.replace(/\n\s+/g, ' ')
       },
@@ -51,22 +51,36 @@ const nextConfig = {
     }];
   },
 
-  // Quantum Environment Variables
+  // Quantum + Paystack Environment Variables
   env: {
+    // Core Quantum
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     NEXT_PUBLIC_QUANTUM_MODE: process.env.NEXT_PUBLIC_QUANTUM_MODE || 'false',
     NEXT_PUBLIC_AI_ASSISTANT_VERSION: '2.4.0',
     NEXT_PUBLIC_QUANTUM_GATEWAY: process.env.NEXT_PUBLIC_QUANTUM_GATEWAY,
-    NEXT_PUBLIC_WEB_MONETIZATION_POINTER: process.env.NEXT_PUBLIC_WEB_MONETIZATION_POINTER
+    
+    // Paystack Integration
+    NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+    PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+    PAYSTACK_API_URL: 'https://api.paystack.co',
+    PAYSTACK_WEBHOOK_SECRET: process.env.PAYSTACK_WEBHOOK_SECRET,
+    
+    // Revenue Sync
+    REVENUE_SYNC_INTERVAL: process.env.REVENUE_SYNC_INTERVAL || '3600',
+    REVENUE_WEBHOOK_PATH: '/api/revenue/webhooks/paystack'
   },
 
-  // Quantum Image Optimization
+  // Image Optimization with Paystack CDN
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.paystack.com',
+      }
     ],
     minimumCacheTTL: 3600,
     formats: ['image/avif', 'image/webp', 'image/quantum'],
@@ -74,12 +88,27 @@ const nextConfig = {
     quantumCompression: true
   },
 
+  // API Route Rewrites for Paystack
+  async rewrites() {
+    return [
+      {
+        source: '/paystack-api/:path*',
+        destination: 'https://api.paystack.co/:path*'
+      },
+      {
+        source: '/api/revenue/webhooks/paystack',
+        destination: '/api/webhooks/paystack'
+      }
+    ];
+  },
+
   // Quantum Experimental Features
   experimental: {
     serverActions: {
       allowedOrigins: [
         process.env.NEXT_PUBLIC_API_URL,
-        '*.quantum-ai.vercel.app'
+        '*.quantum-ai.vercel.app',
+        'https://api.paystack.co'
       ],
       quantumEncryption: true
     },
@@ -94,7 +123,8 @@ const nextConfig = {
       resolveAlias: {
         '~': './src',
         '@quantum': './node_modules/@quantum/core',
-        '@ai': './node_modules/@ai'
+        '@ai': './node_modules/@ai',
+        '@paystack': './node_modules/@paystack'
       },
       quantumOptimization: true
     },
@@ -103,7 +133,7 @@ const nextConfig = {
     neuralCache: true
   },
 
-  // Quantum Webpack Configuration
+  // Webpack Configuration with Paystack
   webpack: (config, { isServer, dev }) => {
     // Quantum Module Federation
     config.experiments = {
@@ -113,13 +143,14 @@ const nextConfig = {
       quantumSplitting: true
     };
 
-    // AI Model Optimization
+    // AI Model + Paystack Optimization
     if (!isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
         'react': 'preact/compat',
         'react-dom': 'preact/compat',
-        'quantum-runtime': '@quantum/core/dist/web'
+        'quantum-runtime': '@quantum/core/dist/web',
+        'paystack-js': '@paystack/inline-js/dist/paystack.min.js'
       };
     }
 
@@ -128,7 +159,8 @@ const nextConfig = {
       config.plugins.push(
         new (require('@quantum/webpack-plugin').QuantumWebpackPlugin)({
           entanglement: true,
-          neuralCompression: true
+          neuralCompression: true,
+          paystackIntegration: true
         })
       );
     }
@@ -136,17 +168,13 @@ const nextConfig = {
     return config;
   },
 
-  // Quantum SSR Caching
-  onDemandEntries: {
-    maxInactiveAge: 60 * 60 * 1000, // 1 hour
-    pagesBufferLength: 10,
-    quantumCache: true
-  },
-
-  // Quantum Deployment Optimization
-  generateBuildId: async () => {
-    return process.env.VERCEL_GIT_COMMIT_SHA || 
-           `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // Paystack Webhook Configuration
+  serverRuntimeConfig: {
+    paystack: {
+      secretKey: process.env.PAYSTACK_SECRET_KEY,
+      webhookSecret: process.env.PAYSTACK_WEBHOOK_SECRET,
+      verificationEndpoint: '/api/transactions/verify'
+    }
   }
 };
 
@@ -158,43 +186,31 @@ if (process.env.NEXT_PUBLIC_QUANTUM_MODE === 'true') {
     quantumBoost: true
   };
 
-  // Enable Quantum CPU Optimization
-  nextConfig.experimental.cpus = {
-    max: 4,
-    min: 2,
-    quantumAllocation: true
-  };
-
-  // Enhanced Quantum Webpack Config
+  // Enhanced Quantum Webpack Config with Paystack
   nextConfig.webpack = (config) => {
     config.plugins.push(
       new (require('@quantum/webpack-plugin').QuantumWebpackPlugin)({
         entanglement: true,
         neuralCompression: true,
-        quantumMinification: true
+        quantumMinification: true,
+        paystackOptimization: true
       }),
-      new (require('@ai/webpack-plugin').NeuralOptimizerPlugin)()
+      new (require('@ai/webpack-plugin').NeuralOptimizerPlugin)(),
+      new (require('@paystack/webpack-plugin').PaystackOptimizerPlugin)()
     );
 
     // Quantum Code Splitting
     config.optimization.splitChunks = {
       ...config.optimization.splitChunks,
       chunks: 'all',
-      maxSize: 244 * 1024, // 244KB chunks
-      minSize: 20 * 1024, // 20KB minimum
-      quantumOptimized: true
+      maxSize: 244 * 1024,
+      minSize: 20 * 1024,
+      quantumOptimized: true,
+      paystackChunks: true
     };
 
     return config;
   };
-
-  // Quantum-Specific Image Optimization
-  nextConfig.images.quantumCompression = {
-    enabled: true,
-    quality: 80,
-    neuralEnhancement: true
-  };
 }
 
-// Export the Quantum-Optimized Config
 module.exports = nextConfig;
