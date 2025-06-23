@@ -1,128 +1,172 @@
-/* styles/globals.css - Quantum AI Enhanced */
+/* styles/globals.css - Quantum AI Enhanced v2 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Quantum Color System ===== */
+/* ===== Quantum Variables & Base Styles ===== */
 @layer base {
   :root {
-    /* Original colors (unchanged) */
+    /* Core color system with opacity control */
     --color-primary: 59 130 246;
     --color-success: 16 185 129;
     --color-danger: 239 68 68;
     --color-warning: 245 158 11;
-
-    /* Quantum additions */
+    
+    /* Quantum spectrum */
     --quantum-core: 0 240 255;
+    --quantum-entanglement: 138 43 226; /* Purple for quantum connections */
     --neural-network: 255 0 170;
     --quantum-glow: 0 240 255;
+    
+    /* Extended palette */
+    --quantum-void: 10 10 30;
+    --quantum-foam: 70 70 120;
   }
 
-  /* Preserved original dashboard styles */
+  /* Base quantum typography */
+  html {
+    @apply scroll-smooth;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Dashboard evolution */
   .dashboard-container {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 1rem;
-    font-family: 'Inter', sans-serif;
+    @apply bg-gradient-to-br from-[#1a1a2e] to-[#16213e] text-white p-8 rounded-2xl;
+    font-family: inherit;
   }
 
-  /* New quantum dashboard variant */
   .quantum-dashboard {
-    background: linear-gradient(135deg, #0e0e2e 0%, #1a1a4a 100%);
-    border: 1px solid rgba(var(--quantum-core), 0.1);
-    box-shadow: 0 0 30px rgba(var(--quantum-core), 0.05);
+    @apply bg-gradient-to-br from-[#0e0e2e] to-[#1a1a4a];
+    border: 1px solid rgba(var(--quantum-core), 0.15);
+    box-shadow: 
+      0 0 30px rgba(var(--quantum-core), 0.05),
+      inset 0 0 20px rgba(var(--quantum-core), 0.02);
   }
 }
 
-/* ===== Enhanced Components ===== */
+/* ===== Quantum Components ===== */
 @layer components {
-  /* Original button with quantum states */
-  button {
-    background: linear-gradient(90deg, 
-      rgb(var(--color-primary)) 0%, 
-      rgb(var(--color-primary) / 90%) 100%);
-    transition: all 0.2s ease-out;
+  /* Quantum button system */
+  .btn {
+    @apply px-6 py-2 rounded-lg font-medium transition-all duration-200 ease-out;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-500 to-blue-400 text-white;
   }
 
-  button.quantum {
-    background: linear-gradient(90deg, 
-      rgba(var(--quantum-core), 0.7) 0%, 
-      rgba(var(--quantum-core), 0.5) 100%);
+  .btn-quantum {
+    @apply bg-gradient-to-r from-[rgba(var(--quantum-core),0.7)] to-[rgba(var(--quantum-core),0.5)] text-white;
     box-shadow: 0 0 15px rgba(var(--quantum-core), 0.3);
   }
 
-  button.neural {
-    background: linear-gradient(90deg, 
-      rgba(var(--neural-network), 0.7) 0%, 
-      rgba(var(--neural-network), 0.5) 100%);
+  .btn-neural {
+    @apply bg-gradient-to-r from-[rgba(var(--neural-network),0.7)] to-[rgba(var(--neural-network),0.5)] text-white;
   }
 
-  /* Enhanced stat cards with quantum glow */
+  /* Enhanced stat cards with interaction */
   .stat-card {
-    @apply bg-white/5 p-6 rounded-xl border border-white/10;
-    transition: all 0.3s ease;
+    @apply bg-white/5 p-6 rounded-xl border border-white/10 backdrop-blur-sm;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    &:hover {
+      @apply border-white/20;
+      transform: translateY(-2px);
+    }
   }
 
   .stat-card.quantum-verified {
-    border-color: rgba(var(--quantum-core), 0.3);
-    box-shadow: 0 0 20px rgba(var(--quantum-core), 0.05);
+    @apply border-[rgba(var(--quantum-core),0.3)];
+    box-shadow: 
+      0 0 20px rgba(var(--quantum-core), 0.05),
+      inset 0 0 10px rgba(var(--quantum-core), 0.1);
   }
 
-  /* Quantum console styling */
+  /* Quantum console with terminal feel */
   .quantum-console {
-    @apply bg-black/50 p-4 rounded-lg font-mono text-sm;
-    border: 1px solid rgba(var(--quantum-core), 0.2);
+    @apply bg-black/50 p-4 rounded-lg font-mono text-sm border border-[rgba(var(--quantum-core),0.2)];
+    text-shadow: 0 0 5px rgba(var(--quantum-glow), 0.5);
   }
 
   .console-line {
     @apply py-1 border-b border-white/5 last:border-0;
   }
+
+  /* Quantum connection visualization */
+  .quantum-connection {
+    @apply absolute h-0.5 bg-gradient-to-r from-[rgba(var(--quantum-core),0.7)] to-[rgba(var(--quantum-entanglement),0.7)];
+    box-shadow: 0 0 10px rgba(var(--quantum-core), 0.5);
+  }
 }
 
-/* ===== Quantum Animations ===== */
+/* ===== Quantum Effects & Utilities ===== */
 @layer utilities {
-  /* Original pulse animation */
+  /* Animation system */
   .pulse-dot {
-    animation: pulse 1.5s infinite;
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
-  /* New quantum animations */
   .quantum-pulse {
-    animation: quantum-pulse 2s infinite;
+    animation: quantum-pulse 2s ease-in-out infinite;
   }
 
   .neural-flicker {
-    animation: neural-flicker 3s infinite;
+    animation: neural-flicker 3s steps(2, start) infinite;
   }
 
   @keyframes quantum-pulse {
     0%, 100% { 
-      opacity: 0.6; 
+      opacity: 0.6;
       box-shadow: 0 0 5px rgba(var(--quantum-core), 0.3);
     }
     50% { 
-      opacity: 1; 
-      box-shadow: 0 0 20px rgba(var(--quantum-core), 0.6);
+      opacity: 1;
+      box-shadow: 0 0 30px rgba(var(--quantum-core), 0.8);
     }
   }
 
   @keyframes neural-flicker {
-    0%, 19%, 21%, 59%, 61%, 100% {
-      opacity: 1;
-    }
-    20%, 60% {
-      opacity: 0.3;
-    }
+    0%, 100% { opacity: 1; }
+    20% { opacity: 0.2; }
+    40% { opacity: 0.8; }
+    60% { opacity: 0.3; }
+    80% { opacity: 0.9; }
   }
 
-  /* Quantum glow effect */
+  /* Visual effects */
   .quantum-glow {
-    text-shadow: 0 0 10px rgba(var(--quantum-glow), 0.7);
+    text-shadow: 0 0 12px rgba(var(--quantum-glow), 0.8);
   }
 
-  /* Safe utility additions */
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .quantum-aura {
+    box-shadow: 0 0 40px rgba(var(--quantum-core), 0.15);
+  }
+
+  /* Performance optimized utilities */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    
+    &::-webkit-scrollbar {
+      @apply hidden;
+    }
+  }
+
+  /* Quantum layout extensions */
+  .perspective-quantum {
+    perspective: 2000px;
+  }
+
+  .quantum-z {
+    transform-style: preserve-3d;
+  }
+}
+
+/* ===== Quantum Responsive Enhancements ===== */
+@media (prefers-reduced-motion: reduce) {
+  .quantum-pulse,
+  .neural-flicker,
+  .pulse-dot {
+    animation: none !important;
   }
 }
