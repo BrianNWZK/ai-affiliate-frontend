@@ -13,29 +13,18 @@
     "optimize": "node scripts/revenue-optimizer.js"
   },
   "dependencies": {
-    // Core
     "next": "^14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    
-    // Quantum Simulation
     "quantum-circuit": "^1.3.0",
     "qiskit.js": "^0.8.0",
-    
-    // AI/ML
     "tensorflow": "^2.4.0",
     "brain.js": "^2.0.0",
-    
-    // UI
     "lucide-react": "^0.300.0",
     "framer-motion": "^11.0.0",
     "react-intersection-observer": "^10.0.0",
-    
-    // Performance
     "lru-cache": "^7.18.3",
     "quick-lru": "^6.1.1",
-    
-    // Payments
     "paystack": "^2.0.0",
     "crypto-js": "^4.1.1"
   },
