@@ -21,32 +21,19 @@
     "lucide-react": "^0.300.0",
     "framer-motion": "^11.0.0",
     "react-intersection-observer": "^10.0.0",
-    
-    "@comment": "Real quantum computing packages - maintaining quantum architecture",
     "quantum-core": "^1.11.0",
     "quantum-circuit": "^2.7.2",
-    "qiskit": "^1.0.0",
-    
-    "@comment": "AI packages that exist - replacing @ai/* packages",
     "ai": "^3.0.0",
     "@vercel/ai": "^3.0.0",
     "openai": "^4.0.0",
     "tensorflow": "^4.0.0",
-    
-    "@comment": "Crypto and Web3 - real packages for blockchain integration",
     "web3": "^4.0.0",
     "ethers": "^6.0.0",
     "crypto-js": "^4.0.0",
-    
-    "@comment": "Monetization - real packages",
     "stripe": "^14.0.0",
     "@stripe/stripe-js": "^2.0.0",
-    
-    "@comment": "Analytics and performance",
     "@vercel/analytics": "^1.0.0",
     "next-seo": "^6.0.0",
-    
-    "@comment": "Cache and performance - real alternatives",
     "redis": "^4.0.0",
     "node-cache": "^5.0.0",
     "lru-cache": "^10.0.0"
