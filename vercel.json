@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/quantum-api/:path*", "destination": "https://quantum-bridge.onrender.com/:path*" }
+  ]
+}
