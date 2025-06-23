@@ -1,6 +1,6 @@
 {
   "name": "quantum-ai-affiliate-pro",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -18,14 +18,14 @@
     "react-dom": "18.2.0",
     "quantum-circuit": "1.3.0",
     "qiskit.js": "0.8.0",
-    "tensorflow": "2.4.0",
+    "@tensorflow/tfjs": "4.12.0",
     "brain.js": "2.0.0-beta.4",
     "lucide-react": "0.300.0",
     "framer-motion": "11.0.0",
     "react-intersection-observer": "10.0.0",
     "lru-cache": "7.18.3",
     "quick-lru": "6.1.1",
-    "paystack": "2.0.0",
+    "paystack-api": "1.0.7",
     "crypto-js": "4.1.1"
   },
   "devDependencies": {
