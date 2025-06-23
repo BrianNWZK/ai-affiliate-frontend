@@ -15,66 +15,44 @@
     "optimize-revenue": "node scripts/revenue-optimizer.js"
   },
   "dependencies": {
-    // Core
     "next": "13.5.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    
-    // Quantum Ecosystem
     "@quantum/core": "^4.0.0",
     "@quantum/webpack-plugin": "^2.0.0",
     "@quantum/monetization": "^1.2.0",
     "@quantum/analytics": "^3.1.0",
-    
-    // AI Stack
     "@ai/cache": "^3.0.0",
     "@ai/crypto": "^2.0.0",
     "@ai/revenue-optimizer": "^1.5.0",
-    
-    // Web3 & Monetization
     "@web3/backup": "^1.0.0",
     "web-monetization-api": "^2.0.0",
     "micropayment-channels": "^0.8.0",
-    
-    // Performance
     "preact": "^11.0.0",
     "preact-render-to-string": "^7.0.0",
     "next-quantum": "^1.0.0",
-    
-    // UI & UX
     "lucide-react": "^0.300.0",
     "framer-motion": "^11.0.0",
     "react-intersection-observer": "^10.0.0",
     "quantum-ui": "^2.0.0",
-    
-    // Money Generation
     "affiliate-engine": "^5.0.0",
     "dynamic-pricing": "^3.0.0",
     "microtransaction-engine": "^2.0.0"
   },
   "devDependencies": {
-    // Core Dev
     "@types/node": "^21.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "typescript": "^5.3.0",
-    
-    // Styling
     "tailwindcss": "^3.4.0",
     "autoprefixer": "^11.0.0",
     "postcss": "^9.0.0",
-    
-    // Quantum Tooling
     "@quantum/types": "^2.0.0",
     "quantum-codegen": "^1.0.0",
     "@quantum/debugger": "^1.0.0",
-    
-    // Analysis
     "@next/bundle-analyzer": "^14.0.0",
     "webpack-bundle-analyzer": "^5.0.0",
     "quantum-analyzer": "^1.0.0",
-    
-    // Testing
     "quantum-testing": "^1.0.0",
     "ai-test-suite": "^2.0.0"
   },
