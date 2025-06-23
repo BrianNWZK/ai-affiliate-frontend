@@ -3,14 +3,14 @@
   "version": "3.0.0",
   "private": true,
   "scripts": {
-    "dev": "NEXT_PUBLIC_QUANTUM_MODE=development next dev --turbo --experimental-optimize",
-    "build": "NEXT_PUBLIC_QUANTUM_MODE=production next build --experimental-quantum",
-    "start": "NEXT_PUBLIC_QUANTUM_MODE=production next start --quantum",
+    "dev": "NEXT_PUBLIC_QUANTUM_MODE=development next dev",
+    "build": "NEXT_PUBLIC_QUANTUM_MODE=production next build",
+    "start": "NEXT_PUBLIC_QUANTUM_MODE=production next start",
     "analyze": "ANALYZE=true next build",
-    "quantum": "NEXT_PUBLIC_QUANTUM_MODE=debug next dev --turbo",
-    "instrument": "NODE_OPTIONS='--require next-intl/plugin' next build --instrument",
+    "quantum": "NEXT_PUBLIC_QUANTUM_MODE=debug next dev",
     "lint": "next lint",
-    "generate-types": "npx @quantum/codegen types && npx @ai/sdk generate",
+    "quantum-simulate": "node scripts/quantum-runner.js",
+    "quantum-test": "node scripts/quantum-test.js",
     "monetize": "node scripts/quantum-monetization.js",
     "optimize-revenue": "node scripts/revenue-optimizer.js"
   },
@@ -18,26 +18,38 @@
     "next": "13.5.11",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@quantum/core": "^4.0.0",
-    "@quantum/webpack-plugin": "^2.0.0",
-    "@quantum/monetization": "^1.2.0",
-    "@quantum/analytics": "^3.1.0",
-    "@ai/cache": "^3.0.0",
-    "@ai/crypto": "^2.0.0",
-    "@ai/revenue-optimizer": "^1.5.0",
-    "@web3/backup": "^1.0.0",
-    "web-monetization-api": "^2.0.0",
-    "micropayment-channels": "^0.8.0",
-    "preact": "^11.0.0",
-    "preact-render-to-string": "^7.0.0",
-    "next-quantum": "^1.0.0",
     "lucide-react": "^0.300.0",
     "framer-motion": "^11.0.0",
     "react-intersection-observer": "^10.0.0",
-    "quantum-ui": "^2.0.0",
-    "affiliate-engine": "^5.0.0",
-    "dynamic-pricing": "^3.0.0",
-    "microtransaction-engine": "^2.0.0"
+    
+    "@comment": "Real quantum computing packages - maintaining quantum architecture",
+    "quantum-core": "^1.11.0",
+    "quantum-circuit": "^2.7.2",
+    "qiskit": "^1.0.0",
+    
+    "@comment": "AI packages that exist - replacing @ai/* packages",
+    "ai": "^3.0.0",
+    "@vercel/ai": "^3.0.0",
+    "openai": "^4.0.0",
+    "tensorflow": "^4.0.0",
+    
+    "@comment": "Crypto and Web3 - real packages for blockchain integration",
+    "web3": "^4.0.0",
+    "ethers": "^6.0.0",
+    "crypto-js": "^4.0.0",
+    
+    "@comment": "Monetization - real packages",
+    "stripe": "^14.0.0",
+    "@stripe/stripe-js": "^2.0.0",
+    
+    "@comment": "Analytics and performance",
+    "@vercel/analytics": "^1.0.0",
+    "next-seo": "^6.0.0",
+    
+    "@comment": "Cache and performance - real alternatives",
+    "redis": "^4.0.0",
+    "node-cache": "^5.0.0",
+    "lru-cache": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^21.0.0",
@@ -45,16 +57,10 @@
     "@types/react-dom": "^18.2.0",
     "typescript": "^5.3.0",
     "tailwindcss": "^3.4.0",
-    "autoprefixer": "^11.0.0",
-    "postcss": "^9.0.0",
-    "@quantum/types": "^2.0.0",
-    "quantum-codegen": "^1.0.0",
-    "@quantum/debugger": "^1.0.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
     "@next/bundle-analyzer": "^14.0.0",
-    "webpack-bundle-analyzer": "^5.0.0",
-    "quantum-analyzer": "^1.0.0",
-    "quantum-testing": "^1.0.0",
-    "ai-test-suite": "^2.0.0"
+    "webpack-bundle-analyzer": "^4.0.0"
   },
   "quantum": {
     "entanglement": {
@@ -91,16 +97,5 @@
         "realTime": true
       }
     }
-  },
-  "browserslist": {
-    "production": [
-      "last 2 quantum versions",
-      "last 2 chrome versions",
-      "last 2 safari versions"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version"
-    ]
   }
 }
