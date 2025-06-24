@@ -1,9 +1,0 @@
-/project-root/
-  app/
-    page.js
-    layout.js
-  components/
-    AffiliateMarketingAI.js
-    NeuralCommerceEcosystem.js
-  package.json
-  next.config.js
