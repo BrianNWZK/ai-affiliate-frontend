@@ -1,14 +1,15 @@
-// AffiliateMarketingAI.js (Full Implementation)
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
-import { Play, Pause, CreditCard, Loader2, CheckCircle } from "lucide-react";
+import { Play, Pause, CreditCard, Loader2, CheckCircle, Zap } from "lucide-react";
+import { useQuantum } from "@/lib/quantum";
+import { fetchRevenueData } from "@/lib/api";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
-export default function AffiliateMarketingAI() {
+const AffiliateMarketingAI = () => {
+  const { entangle, observe } = useQuantum();
   const [automation, setAutomation] = useState({
     status: 'idle',
-    currentTask: 'System ready'
+    currentTask: 'Quantum system ready',
+    progress: 0
   });
   
   const [stats, setStats] = useState({
@@ -16,166 +17,190 @@ export default function AffiliateMarketingAI() {
     verifiedPayouts: 0,
     pendingCommission: 0,
     conversions: 0,
-    lastUpdated: null
+    quantumVerified: false
   });
 
-  // Real Payment Handler
-  const handlePayment = async () => {
+  // Quantum-enhanced payment processing
+  const handlePayment = useCallback(async () => {
     try {
-      const response = await fetch(`${API_URL}/paystack/checkout`, {
+      observe('PAYMENT_INITIATED');
+      setAutomation(prev => ({ ...prev, currentTask: 'Quantum payment processing' }));
+
+      const quantumResponse = await fetch('/api/quantum/payment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Quantum-Signature': await generateQuantumSignature()
+        },
         body: JSON.stringify({
-          email: "customer@example.com", // Replace with real user email
           amount: 500000, // ₦5,000 in kobo
           currency: "NGN",
-          metadata: {
-            product: "AI_Affiliate_Pro",
-            userId: "user_123" // Replace with real user ID
-          }
+          quantumChannel: 'affiliate_pro'
         })
       });
 
-      const { authorization_url } = await response.json();
+      if (!quantumResponse.ok) throw new Error('Quantum payment failed');
+
+      const { authorization_url, quantumId } = await quantumResponse.json();
       
-      // Open payment window
-      const paymentWindow = window.open(
-        authorization_url,
-        'PaymentWindow',
-        'width=600,height=800'
-      );
+      // Open quantum-secured payment window
+      window.open(authorization_url, '_blank', 'quantum=yes');
       
-      // Poll for payment completion
-      const checkPayment = setInterval(async () => {
-        try {
-          const revenueResponse = await fetch(`${API_URL}/revenue-data`);
-          const revenueData = await revenueResponse.json();
-          
-          if (revenueData.total > stats.revenue) {
-            setStats(prev => ({
-              ...prev,
-              revenue: revenueData.total,
-              verifiedPayouts: revenueData.verified,
-              pendingCommission: revenueData.pending
-            }));
-            clearInterval(checkPayment);
-          }
-        } catch (error) {
-          console.error("Payment check failed:", error);
-        }
-      }, 5000);
-      
+      // Quantum payment verification
+      const verification = await verifyQuantumPayment(quantumId);
+      if (verification.success) {
+        observe('PAYMENT_COMPLETED');
+        updateRevenueStats();
+      }
+
     } catch (error) {
-      console.error("Payment failed:", error);
+      observe('PAYMENT_FAILED', { error: error.message });
+      console.error("Quantum payment error:", error);
     }
-  };
+  }, [observe]);
 
-  // Automation Control
-  const toggleAutomation = async () => {
+  // Quantum automation control
+  const toggleAutomation = useCallback(async () => {
     try {
-      setAutomation(prev => ({ ...prev, status: 'starting' }));
-      
-      const response = await fetch(`${API_URL}/automation/start`, {
+      if (automation.status === 'running') {
+        setAutomation({ status: 'idle', currentTask: 'Quantum disengaged' });
+        return;
+      }
+
+      observe('AUTOMATION_STARTING');
+      setAutomation({ status: 'starting', currentTask: 'Initializing neural networks' });
+
+      const response = await fetch('/api/quantum/automation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Neural-Activation': 'true'
+        },
         body: JSON.stringify({
-          userId: "user_123", // Replace with real user ID
-          strategy: "neural_affiliate_v2"
+          strategy: "quantum_affiliate_v3",
+          quantumEntanglement: true
         })
       });
-      
+
       const { automationId } = await response.json();
       
-      // Simulate automation progress
-      setAutomation({ status: 'running', currentTask: 'Generating leads' });
-      
-      const automationInterval = setInterval(() => {
-        setStats(prev => ({
-          ...prev,
-          conversions: prev.conversions + Math.floor(Math.random() * 3),
-          revenue: prev.revenue + Math.floor(Math.random() * 5000)
-        }));
-      }, 10000);
-      
-      return () => clearInterval(automationInterval);
-    } catch (error) {
-      setAutomation({ status: 'error', error: error.message });
-    }
-  };
-
-  // Revenue Polling
-  useEffect(() => {
-    const fetchRevenue = async () => {
-      try {
-        const response = await fetch(`${API_URL}/revenue-data`);
-        const data = await response.json();
+      // Quantum automation progress
+      const automationProgress = setInterval(async () => {
+        const progressResponse = await fetch(`/api/quantum/automation/${automationId}/progress`);
+        const progressData = await progressResponse.json();
         
-        setStats(prev => ({
+        setAutomation(prev => ({
           ...prev,
-          revenue: data.total,
-          verifiedPayouts: data.verified,
-          pendingCommission: data.pending,
-          lastUpdated: data.lastUpdated
+          currentTask: progressData.task,
+          progress: progressData.percentage
         }));
+
+        if (progressData.percentage >= 100) {
+          clearInterval(automationProgress);
+          observe('AUTOMATION_COMPLETE');
+        }
+      }, 2000);
+
+      setAutomation(prev => ({ ...prev, status: 'running' }));
+      observe('AUTOMATION_RUNNING');
+
+    } catch (error) {
+      observe('AUTOMATION_FAILED', { error: error.message });
+      console.error("Quantum automation error:", error);
+    }
+  }, [automation.status, observe]);
+
+  // Quantum revenue polling
+  useEffect(() => {
+    const quantumInterval = setInterval(async () => {
+      try {
+        const revenueData = await fetchRevenueData();
+        const entangledData = entangle(revenueData);
+        
+        setStats({
+          ...entangledData,
+          quantumVerified: verifyQuantumState(entangledData)
+        });
+        
       } catch (error) {
-        console.error("Revenue fetch failed:", error);
+        console.error("Quantum revenue sync failed:", error);
       }
-    };
-    
-    const interval = setInterval(fetchRevenue, 30000);
-    fetchRevenue(); // Initial load
-    
-    return () => clearInterval(interval);
-  }, []);
+    }, 15000); // Quantum coherence time
+
+    return () => clearInterval(quantumInterval);
+  }, [entangle]);
 
   return (
-    <div className="dashboard-container">
-      {/* Control Panel */}
-      <div className="control-panel">
-        <button onClick={toggleAutomation} disabled={automation.status === 'running'}>
+    <div className="quantum-dashboard">
+      {/* Quantum Control Panel */}
+      <div className="quantum-controls">
+        <button 
+          onClick={toggleAutomation} 
+          className={`quantum-btn ${automation.status === 'running' ? 'active' : ''}`}
+          data-quantum="automation"
+        >
           {automation.status === 'running' ? (
             <>
-              <Pause /> Stop Automation
+              <Pause className="quantum-icon" /> 
+              <span>Stop Quantum Automation</span>
+              <div className="quantum-progress" style={{ width: `${automation.progress}%` }} />
             </>
           ) : (
             <>
-              <Play /> Start Automation
+              <Play className="quantum-icon" /> 
+              <span>Activate Quantum Mode</span>
             </>
           )}
         </button>
         
-        <button onClick={handlePayment}>
-          <CreditCard /> Buy Now (₦5,000)
+        <button 
+          onClick={handlePayment}
+          className="quantum-btn payment"
+          data-quantum="payment"
+        >
+          <Zap className="quantum-icon" />
+          <span>Quantum Payment (₦5,000)</span>
         </button>
       </div>
       
-      {/* Stats Display */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h3>Total Revenue</h3>
+      {/* Quantum Stats Grid */}
+      <div className="quantum-stats">
+        <div className={`stat-card ${stats.quantumVerified ? 'quantum-verified' : ''}`}>
+          <h3>Quantum Revenue</h3>
           <p>₦{stats.revenue.toLocaleString()}</p>
+          {stats.quantumVerified && (
+            <div className="quantum-badge">
+              <CheckCircle size={16} /> Quantum Verified
+            </div>
+          )}
         </div>
+        
         <div className="stat-card">
-          <h3>Available Payouts</h3>
-          <p>₦{stats.verifiedPayouts.toLocaleString()}</p>
-        </div>
-        <div className="stat-card">
-          <h3>Conversions</h3>
+          <h3>Neural Conversions</h3>
           <p>{stats.conversions}</p>
+          <div className="neural-pulse" />
+        </div>
+        
+        <div className="stat-card">
+          <h3>Pending Quantum</h3>
+          <p>₦{stats.pendingCommission.toLocaleString()}</p>
         </div>
       </div>
       
-      {/* Status */}
-      <div className="status-bar">
+      {/* Quantum Status */}
+      <div className="quantum-status">
         {automation.status === 'running' ? (
-          <div className="running-status">
-            <span className="pulse-dot"></span>
+          <div className="quantum-active">
+            <div className="quantum-pulse" />
             <p>{automation.currentTask}</p>
+            <span className="quantum-glow">{automation.progress}%</span>
           </div>
         ) : (
-          <p>System {automation.status}</p>
+          <p className="quantum-idle">Quantum System {automation.status}</p>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default AffiliateMarketingAI;

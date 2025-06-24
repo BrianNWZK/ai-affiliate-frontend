@@ -1,17 +1,49 @@
 {
-  "name": "ai-affiliate-frontend",
-  "version": "1.0.0",
+  "name": "quantum-ai-affiliate-pro",
+  "version": "3.1.5",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "analyze": "ANALYZE=true next build",
+    "lint": "next lint",
+    "simulate": "node scripts/simulation-runner.js",
+    "test": "jest",
+    "optimize": "node scripts/revenue-optimizer.js"
   },
   "dependencies": {
-    "next": "13.5.11",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "lucide-react": "latest",
-    "node-fetch": "^3.3.2"
+    "next": "14.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "quantum-circuit": "1.3.0",
+    "qiskit.js": "0.8.0",
+    "@tensorflow/tfjs": "4.12.0",
+    "brain.js": "2.0.0-beta.4",
+    "lucide-react": "0.300.0",
+    "framer-motion": "11.0.0",
+    "react-intersection-observer": "10.0.0",
+    "lru-cache": "7.18.3",
+    "quick-lru": "6.1.1",
+    "paystack-api": "1.0.7",
+    "crypto-js": "4.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.0",
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.0",
+    "typescript": "5.3.0",
+    "tailwindcss": "3.4.0",
+    "autoprefixer": "10.4.16",
+    "postcss": "8.4.35",
+    "jest": "29.0.0"
+  },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"]
   }
 }
